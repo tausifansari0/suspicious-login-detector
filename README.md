@@ -11,7 +11,7 @@ A Python project that detects suspicious authentication events from login logs.
 - Success After Failure Detection
 - Risk Scoring
 - Dashboard
- 
+  
 ## Tech Stack
 
 - Python
