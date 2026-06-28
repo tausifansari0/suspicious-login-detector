@@ -1,7 +1,9 @@
-bruteforce:
+brute_force:
   threshold: 5
-  window_minutes: 5
+  window_minutes: 10
 
-risk:
-  high: 80
-  medium: 50
+impossible_travel:
+  max_speed_kmh: 900
+
+risk_scoring:
+  enabled: true

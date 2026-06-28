@@ -1,41 +1,21 @@
 # Suspicious Login Activity Detector
 
-A Python project that detects suspicious authentication events from login logs.
+A Python-based project that analyzes login events and detects suspicious authentication activities.
 
-## Planned Features
+## Features
 
-- Brute Force Detection
-- Impossible Travel Detection
-- Login Time Anomaly
-- New Device Detection
-- Success After Failure Detection
-- Risk Scoring
-- Dashboard
-  
-## Tech Stack
+- Login log processing
+- Configurable detection rules
+- Risk scoring
+- Dashboard visualization
 
-- Python
-- Pandas
-- YAML
-- HTML
+## Project Structure
 
-## Progress
-Timestamp
-
-Username
-
-IP Address
-
-Country
-
-City
-
-Device
-
-Login Status
-
-## Project Status
-
-
-
-🚧 Under Development
+```
+detector.py
+config.py
+config.yaml
+generate_sample_logs.py
+dashboard.html
+README.md
+```
