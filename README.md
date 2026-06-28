@@ -19,6 +19,23 @@ A Python project that detects suspicious authentication events from login logs.
 - YAML
 - HTML
 
+## Progress
+Timestamp
+
+Username
+
+IP Address
+
+Country
+
+City
+
+Device
+
+Login Status
+
 ## Project Status
+
+
 
 🚧 Under Development
