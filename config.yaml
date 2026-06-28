@@ -1,1 +1,7 @@
+bruteforce:
+  threshold: 5
+  window_minutes: 5
 
+risk:
+  high: 80
+  medium: 50

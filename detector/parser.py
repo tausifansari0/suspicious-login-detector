@@ -1,0 +1,2 @@
+class LogParser:
+    pass
