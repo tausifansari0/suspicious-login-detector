@@ -1,0 +1,203 @@
+{
+  "generated_at": "2026-06-30T00:43:51.280801",
+  "statistics": {
+    "total_events_processed": 274,
+    "total_alerts": 11,
+    "alerts_by_rule": {
+      "IMPOSSIBLE_TRAVEL": 3,
+      "BRUTE_FORCE": 2,
+      "SUCCESS_AFTER_FAILURES": 1,
+      "CREDENTIAL_STUFFING": 1,
+      "LOGIN_TIME_ANOMALY": 2,
+      "NEW_DEVICE": 2
+    },
+    "alerts_by_severity": {
+      "CRITICAL": 3,
+      "HIGH": 4,
+      "MEDIUM": 4
+    },
+    "unique_users_flagged": 5
+  },
+  "risk_scores": [
+    {
+      "username": "sandeep.t",
+      "threat_score": 100,
+      "risk_tier": "CRITICAL",
+      "contributing_rules": [
+        "IMPOSSIBLE_TRAVEL",
+        "NEW_DEVICE",
+        "SUCCESS_AFTER_FAILURES",
+        "BRUTE_FORCE"
+      ]
+    },
+    {
+      "username": "priya.s",
+      "threat_score": 80,
+      "risk_tier": "CRITICAL",
+      "contributing_rules": [
+        "IMPOSSIBLE_TRAVEL",
+        "IMPOSSIBLE_TRAVEL"
+      ]
+    },
+    {
+      "username": "neha.r",
+      "threat_score": 60,
+      "risk_tier": "HIGH",
+      "contributing_rules": [
+        "LOGIN_TIME_ANOMALY",
+        "NEW_DEVICE",
+        "CREDENTIAL_STUFFING"
+      ]
+    },
+    {
+      "username": "rakesh.k",
+      "threat_score": 30,
+      "risk_tier": "MEDIUM",
+      "contributing_rules": [
+        "BRUTE_FORCE"
+      ]
+    },
+    {
+      "username": "amit.v",
+      "threat_score": 10,
+      "risk_tier": "LOW",
+      "contributing_rules": [
+        "LOGIN_TIME_ANOMALY"
+      ]
+    }
+  ],
+  "alerts": [
+    {
+      "timestamp": "2026-06-04T14:40:00",
+      "rule": "IMPOSSIBLE_TRAVEL",
+      "severity": "CRITICAL",
+      "username": "priya.s",
+      "detail": "Mumbai -> London, 7192 km in 0.67h (implied speed 10788 km/h)",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts",
+        "tactic": "Initial Access / Persistence"
+      }
+    },
+    {
+      "timestamp": "2026-06-04T17:42:00",
+      "rule": "IMPOSSIBLE_TRAVEL",
+      "severity": "CRITICAL",
+      "username": "priya.s",
+      "detail": "London -> Mumbai, 7192 km in 3.03h (implied speed 2371 km/h)",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts",
+        "tactic": "Initial Access / Persistence"
+      }
+    },
+    {
+      "timestamp": "2026-06-06T16:09:00",
+      "rule": "IMPOSSIBLE_TRAVEL",
+      "severity": "CRITICAL",
+      "username": "sandeep.t",
+      "detail": "Mumbai -> Bengaluru, 845 km in 0.63h (implied speed 1335 km/h)",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts",
+        "tactic": "Initial Access / Persistence"
+      }
+    },
+    {
+      "timestamp": "2026-06-03T03:12:40",
+      "rule": "BRUTE_FORCE",
+      "severity": "HIGH",
+      "username": "rakesh.k",
+      "detail": "5 failed attempts from 203.0.113.77 within 10 min window",
+      "mitre": {
+        "technique_id": "T1110.001",
+        "technique_name": "Brute Force: Password Guessing",
+        "tactic": "Credential Access"
+      }
+    },
+    {
+      "timestamp": "2026-06-06T16:09:00",
+      "rule": "SUCCESS_AFTER_FAILURES",
+      "severity": "HIGH",
+      "username": "sandeep.t",
+      "detail": "Successful login immediately followed 4 failed attempts within 15 min",
+      "mitre": {
+        "technique_id": "T1110",
+        "technique_name": "Brute Force (Successful)",
+        "tactic": "Credential Access"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T02:04:00",
+      "rule": "CREDENTIAL_STUFFING",
+      "severity": "HIGH",
+      "username": "neha.r",
+      "detail": "IP 198.51.100.23 attempted 4 distinct usernames (\u22642 tries each) within 15 min -- consistent with credential stuffing",
+      "mitre": {
+        "technique_id": "T1110.004",
+        "technique_name": "Brute Force: Credential Stuffing",
+        "tactic": "Credential Access"
+      }
+    },
+    {
+      "timestamp": "2026-06-07T02:05:20",
+      "rule": "BRUTE_FORCE",
+      "severity": "HIGH",
+      "username": "sandeep.t",
+      "detail": "5 failed attempts from 198.51.100.23 within 10 min window",
+      "mitre": {
+        "technique_id": "T1110.001",
+        "technique_name": "Brute Force: Password Guessing",
+        "tactic": "Credential Access"
+      }
+    },
+    {
+      "timestamp": "2026-06-01T18:18:00",
+      "rule": "LOGIN_TIME_ANOMALY",
+      "severity": "MEDIUM",
+      "username": "neha.r",
+      "detail": "Login at 18:18 deviates 2.7\u03c3 from user baseline (avg ~11.4h, n=5)",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts (Anomalous Usage Pattern)",
+        "tactic": "Defense Evasion"
+      }
+    },
+    {
+      "timestamp": "2026-06-05T03:05:00",
+      "rule": "LOGIN_TIME_ANOMALY",
+      "severity": "MEDIUM",
+      "username": "amit.v",
+      "detail": "Login at 03:05 deviates 10.6\u03c3 from user baseline (avg ~9.4h, n=28)",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts (Anomalous Usage Pattern)",
+        "tactic": "Defense Evasion"
+      }
+    },
+    {
+      "timestamp": "2026-06-05T11:20:00",
+      "rule": "NEW_DEVICE",
+      "severity": "MEDIUM",
+      "username": "neha.r",
+      "detail": "Login from previously unseen device 'Firefox-Linux-Desktop' on 190.250.162.123",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts (Unfamiliar Device)",
+        "tactic": "Initial Access / Defense Evasion"
+      }
+    },
+    {
+      "timestamp": "2026-06-06T16:09:00",
+      "rule": "NEW_DEVICE",
+      "severity": "MEDIUM",
+      "username": "sandeep.t",
+      "detail": "Login from previously unseen device 'Chrome-Win10-Desktop' on 99.140.147.32",
+      "mitre": {
+        "technique_id": "T1078",
+        "technique_name": "Valid Accounts (Unfamiliar Device)",
+        "tactic": "Initial Access / Defense Evasion"
+      }
+    }
+  ]
+}

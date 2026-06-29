@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Activity — Detection Console</title>
+<style>
+  :root{
+    --bg: #0a0d12;
+    --panel: #11161d;
+    --panel-border: #1f2730;
+    --text: #d7dde3;
+    --text-dim: #7c8896;
+    --text-faint: #4d5762;
+    --critical: #ff4d5e;
+    --high: #ff9b42;
+    --medium: #ffd24a;
+    --low: #4ecbb0;
+    --accent: #5b9dff;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 28px 32px 60px;
+  }
+  .mono{ font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace; }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex; align-items:baseline; justify-content:space-between;
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 18px; margin-bottom: 28px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .title-block h1{
+    font-size: 19px; font-weight: 600; letter-spacing: 0.01em; color: var(--text);
+  }
+  .title-block .sub{
+    font-size: 12px; color: var(--text-dim); margin-top: 4px;
+  }
+  .live-dot{
+    display:inline-block; width:6px; height:6px; border-radius:50%;
+    background: var(--low); margin-right:7px; box-shadow: 0 0 0 0 rgba(78,203,176,.5);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(78,203,176,.45); }
+    70%{ box-shadow: 0 0 0 6px rgba(78,203,176,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(78,203,176,0); }
+  }
+  .gen-time{ font-size: 11px; color: var(--text-faint); text-align:right; }
+  .gen-time span{ color: var(--text-dim); }
+
+  /* ---------- Stat strip ---------- */
+  .stats{
+    display:grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
+    margin-bottom: 28px;
+  }
+  .stat-card{
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 6px; padding: 16px 18px;
+  }
+  .stat-card .label{ font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-card .value{ font-size: 26px; font-weight: 600; margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+  .stat-card.crit .value{ color: var(--critical); }
+  .stat-card.high .value{ color: var(--high); }
+  .stat-card.med .value{ color: var(--medium); }
+
+  /* ---------- Layout grid ---------- */
+  .grid{
+    display:grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px;
+  }
+  @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
+
+  .panel{
+    background: var(--panel); border: 1px solid var(--panel-border);
+    border-radius: 8px; overflow:hidden;
+  }
+  .panel-head{
+    padding: 14px 18px; border-bottom: 1px solid var(--panel-border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .panel-head h2{ font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+  .panel-head .count{ font-size: 11px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+
+  /* ---------- Risk scoring panel ---------- */
+  .risk-row{
+    padding: 14px 18px; border-bottom: 1px solid var(--panel-border);
+  }
+  .risk-row:last-child{ border-bottom:none; }
+  .risk-top{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 8px; }
+  .risk-user{ font-size: 13.5px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .risk-score{ font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); }
+  .risk-score b{ color: var(--text); }
+  .risk-bar-track{
+    height: 6px; background: #1a2129; border-radius: 4px; overflow:hidden; margin-bottom: 8px;
+  }
+  .risk-bar-fill{ height:100%; border-radius:4px; }
+  .tier-pill{
+    display:inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 3px; text-transform: uppercase; margin-right: 8px;
+  }
+  .tier-CRITICAL{ background: rgba(255,77,94,.15); color: var(--critical); }
+  .tier-HIGH{ background: rgba(255,155,66,.15); color: var(--high); }
+  .tier-MEDIUM{ background: rgba(255,210,74,.15); color: var(--medium); }
+  .tier-LOW{ background: rgba(78,203,176,.15); color: var(--low); }
+  .risk-rules{ font-size: 11px; color: var(--text-faint); }
+  .risk-rules span{ color: var(--text-dim); }
+
+  /* ---------- Alert feed ---------- */
+  .alert-row{
+    padding: 12px 18px; border-bottom: 1px solid var(--panel-border);
+    display:grid; grid-template-columns: 96px 16px 1fr; gap: 12px; align-items:start;
+  }
+  .alert-row:last-child{ border-bottom:none; }
+  .alert-time{ font-size: 11px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; padding-top:2px; }
+  .sev-bar{ width:3px; height: 100%; border-radius:2px; min-height: 30px; align-self:stretch; }
+  .sev-CRITICAL{ background: var(--critical); }
+  .sev-HIGH{ background: var(--high); }
+  .sev-MEDIUM{ background: var(--medium); }
+  .sev-LOW{ background: var(--low); }
+  .alert-main .rule-line{ display:flex; align-items:center; gap:8px; margin-bottom:4px; flex-wrap:wrap; }
+  .rule-name{ font-size: 12.5px; font-weight: 700; letter-spacing: 0.01em; }
+  .rule-name.CRITICAL{ color: var(--critical); }
+  .rule-name.HIGH{ color: var(--high); }
+  .rule-name.MEDIUM{ color: var(--medium); }
+  .rule-name.LOW{ color: var(--low); }
+  .alert-user{ font-size: 11.5px; color: var(--text-dim); font-family: 'JetBrains Mono', monospace; }
+  .alert-detail{ font-size: 12px; color: var(--text-dim); line-height:1.5; }
+  .mitre-tag{
+    font-size: 10px; color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    margin-top: 5px; display:inline-block;
+    border: 1px solid rgba(91,157,255,.3); padding: 1px 6px; border-radius: 3px;
+  }
+
+  /* ---------- Rule distribution mini bars ---------- */
+  .dist-row{
+    padding: 10px 18px; display:flex; align-items:center; gap: 12px;
+  }
+  .dist-label{ font-size: 11.5px; color: var(--text-dim); width: 170px; flex-shrink:0; font-family: 'JetBrains Mono', monospace; }
+  .dist-track{ flex:1; height: 8px; background:#1a2129; border-radius:4px; overflow:hidden; }
+  .dist-fill{ height:100%; background: var(--accent); border-radius:4px; }
+  .dist-count{ font-size: 11.5px; color: var(--text); width: 24px; text-align:right; font-family: 'JetBrains Mono', monospace; }
+
+  footer{
+    margin-top: 28px; text-align:center; font-size: 11px; color: var(--text-faint);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1><span class="live-dot"></span>SUSPICIOUS LOGIN ACTIVITY — DETECTION CONSOLE</h1>
+    <div class="sub">Correlation engine output · 6 active detection rules · MITRE ATT&CK mapped</div>
+  </div>
+  <div class="gen-time">Report generated<br><span id="genTime" class="mono">—</span></div>
+</header>
+
+<div class="stats" id="statsStrip"></div>
+
+<div class="grid">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>ALERT FEED</h2>
+      <div class="count" id="alertCount">0 alerts</div>
+    </div>
+    <div id="alertFeed"></div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:20px;">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>PER-USER THREAT SCORE</h2>
+        <div class="count" id="userCount">0 users</div>
+      </div>
+      <div id="riskPanel"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>ALERTS BY RULE</h2>
+      </div>
+      <div id="distPanel" style="padding: 8px 0;"></div>
+    </div>
+  </div>
+</div>
+
+<footer>Suspicious Login Activity Detector — local correlation engine, no external data transmitted</footer>
+
+<script>
+const SEVERITY_VAR = { CRITICAL: 'var(--critical)', HIGH: 'var(--high)', MEDIUM: 'var(--medium)', LOW: 'var(--low)' };
+
+async function loadReport() {
+  try {
+    const res = await fetch('alerts_report.json');
+    if (!res.ok) throw new Error('not found');
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function fmtTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('en-IN', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderStats(stats) {
+  const cards = [
+    { label: 'Events Processed', value: stats.total_events_processed, cls: '' },
+    { label: 'Total Alerts', value: stats.total_alerts, cls: '' },
+    { label: 'Critical', value: (stats.alerts_by_severity.CRITICAL || 0), cls: 'crit' },
+    { label: 'High', value: (stats.alerts_by_severity.HIGH || 0), cls: 'high' },
+    { label: 'Users Flagged', value: stats.unique_users_flagged, cls: 'med' },
+  ];
+  document.getElementById('statsStrip').innerHTML = cards.map(c => `
+    <div class="stat-card ${c.cls}">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+    </div>`).join('');
+}
+
+function renderAlerts(alerts) {
+  document.getElementById('alertCount').textContent = `${alerts.length} alerts`;
+  document.getElementById('alertFeed').innerHTML = alerts.map(a => `
+    <div class="alert-row">
+      <div class="alert-time">${fmtTime(a.timestamp)}</div>
+      <div class="sev-bar sev-${a.severity}"></div>
+      <div class="alert-main">
+        <div class="rule-line">
+          <span class="rule-name ${a.severity}">${a.rule.replace(/_/g,' ')}</span>
+          <span class="alert-user">${a.username}</span>
+        </div>
+        <div class="alert-detail">${a.detail}</div>
+        <span class="mitre-tag">${a.mitre.technique_id} · ${a.mitre.technique_name}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderRisk(riskScores) {
+  document.getElementById('userCount').textContent = `${riskScores.length} users`;
+  document.getElementById('riskPanel').innerHTML = riskScores.map(r => `
+    <div class="risk-row">
+      <div class="risk-top">
+        <span class="risk-user">${r.username}</span>
+        <span class="risk-score"><b>${r.threat_score}</b>/100</span>
+      </div>
+      <div class="risk-bar-track">
+        <div class="risk-bar-fill" style="width:${r.threat_score}%; background:${SEVERITY_VAR[r.risk_tier] || 'var(--accent)'}"></div>
+      </div>
+      <div>
+        <span class="tier-pill tier-${r.risk_tier}">${r.risk_tier}</span>
+        <span class="risk-rules"><span>${[...new Set(r.contributing_rules)].join(', ')}</span></span>
+      </div>
+    </div>`).join('');
+}
+
+function renderDist(byRule) {
+  const max = Math.max(...Object.values(byRule), 1);
+  document.getElementById('distPanel').innerHTML = Object.entries(byRule)
+    .sort((a,b) => b[1]-a[1])
+    .map(([rule, count]) => `
+      <div class="dist-row">
+        <div class="dist-label">${rule.replace(/_/g,' ')}</div>
+        <div class="dist-track"><div class="dist-fill" style="width:${(count/max*100)}%"></div></div>
+        <div class="dist-count">${count}</div>
+      </div>`).join('');
+}
+
+function renderEmptyState() {
+  document.getElementById('alertFeed').innerHTML =
+    `<div style="padding:32px 18px; color:var(--text-dim); font-size:13px;">
+      No alerts_report.json found alongside this file.<br><br>
+      Run <span class="mono" style="color:var(--accent);">python detector.py</span>
+      in the project folder first, then open this dashboard from the same directory.
+    </div>`;
+}
+
+(async function init() {
+  const data = await loadReport();
+  if (!data) { renderEmptyState(); return; }
+
+  document.getElementById('genTime').textContent = fmtTime(data.generated_at);
+  renderStats(data.statistics);
+  renderAlerts(data.alerts);
+  renderRisk(data.risk_scores);
+  renderDist(data.statistics.alerts_by_rule);
+})();
+</script>
+</body>
+</html>

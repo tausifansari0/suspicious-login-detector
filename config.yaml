@@ -1,9 +1,51 @@
+# Suspicious Login Activity Detector — Configuration
+# Centralizing thresholds here (instead of hardcoding in detector logic)
+# mirrors how real SIEM/SOAR platforms expose tunable correlation rules
+# per deployment/environment.
+
 brute_force:
-  threshold: 5
-  window_minutes: 10
+  threshold: 5            # failed attempts to trigger
+  window_minutes: 10      # rolling window size
 
 impossible_travel:
-  max_speed_kmh: 900
+  max_speed_kmh: 900       # ~commercial flight speed; faster than this is "impossible"
+  min_distance_km: 50      # ignore small distances (GPS noise, same-city IP changes)
+
+login_time_anomaly:
+  z_threshold: 2.5          # std-deviations from user's baseline login hour
+  min_history: 5            # logins needed before baseline is trusted
+
+new_device:
+  # a "device" here = ip + user-agent fingerprint
+  lookback_days: 30          # how far back to consider a device "known"
+
+success_after_failures:
+  min_failures: 3            # failed attempts immediately preceding a success
+  window_minutes: 15
+
+credential_stuffing:
+  # distributed, low-and-slow pattern: many different usernames tried
+  # from a small set of IPs in a short window (unlike brute force, which
+  # is one IP hammering one user)
+  min_distinct_users: 4
+  window_minutes: 15
+  max_attempts_per_user: 2   # stuffing tries each credential only a couple times
 
 risk_scoring:
-  enabled: true
+  weights:
+    BRUTE_FORCE: 30
+    IMPOSSIBLE_TRAVEL: 40
+    LOGIN_TIME_ANOMALY: 10
+    NEW_DEVICE: 15
+    SUCCESS_AFTER_FAILURES: 25
+    CREDENTIAL_STUFFING: 35
+  thresholds:
+    low: 20
+    medium: 50
+    high: 80
+    # anything >= high tier's ceiling implicitly becomes "critical" in the scorer
+
+output:
+  csv_path: "alerts_report.csv"
+  json_path: "alerts_report.json"
+  dashboard_path: "dashboard.html"
